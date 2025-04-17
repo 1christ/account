@@ -1,0 +1,26 @@
+config:
+  name: "/accounts/{id}/unbindEmail解绑邮箱"
+  base_url: ${ENV(BASE_URL)}
+  variables:
+    url: ${ENV(BASE_URL)}
+  parameters:
+    name-type-status_code-msg:
+      - [ "解绑邮箱-用户只绑定了手机号",1,204,"" ]
+      - [ "解绑邮箱-用户设置了用户名密码",2,204,"" ]
+      - [ "解绑邮箱-用户设置了用户名没有设置密码",3,422,"ShouldBindPhoneOrSetUsernameOrEmailWithPassword" ]
+      - [ "解绑邮箱-用户没有绑定手机号和用户名密码",4,422,"ShouldBindPhoneOrSetUsernameOrEmailWithPassword" ]
+      - [ "解绑邮箱-用户没有绑定邮箱",5,204,"" ]
+
+
+
+teststeps:
+  - name: $name
+    variables:
+      user_id: ${delete_email($type,$url)}
+    request:
+      method: DELETE
+      url: /accounts/$user_id/unbindEmail
+    validate:
+      - eq: [ "status_code", $status_code ]
+      - contains: [ "text", $msg ]
+

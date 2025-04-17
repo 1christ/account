@@ -1,0 +1,60 @@
+config:
+  name: "发送验证码 - 查询验证码- 校验验证码"
+  base_url: ${ENV(BASE_URL)}
+  variables:
+    url: ${ENV(BASE_URL)}
+  parameters:
+    name-captchaType-sendType-phone_number-msg-status_code:
+      - [ "验证码- 通用手机验证码验证通过","COMMON",0,14996857401,"",200]
+      - [ "验证码- 通用手机验证码验证不通过","COMMON",0,14996857402,"CaptchaVerifyFailedException",422]
+      - [ "验证码- 登录手机验证码验证通过","LOGIN",0,14996857403,"",200]
+      - [ "验证码- 登录手机验证码验证不通过","LOGIN",0,14996857404,"CaptchaVerifyFailedException",422]
+      - [ "验证码- 注册手机验证码验证通过","REGISTER",0,14996857405,"",200]
+      - [ "验证码- 注册手机验证码验证不通过","REGISTER",0,14996857406,"CaptchaVerifyFailedException",422]
+      - [ "验证码- 邮箱验证码验证通过","COMMON",2,"qinwang@codemao.cn","",200]
+      - [ "验证码- 邮箱验证码验证不通过","COMMON",2,"1583492267@qq.com","CaptchaVerifyFailedException",422]
+
+teststeps:
+  - name: 发送验证码
+    request:
+      method: POST
+      url: /accounts/captcha/send
+      json:
+        acwTc: null
+        captchaType: $captchaType
+        extend: 自动化脚本
+        identity: account
+        phoneNumber: $phone_number
+        pid: account
+        sendType: $sendType
+    validate:
+      - eq: [ "status_code", 200 ]
+      - contains: [ "text", "true" ]
+
+  - name: 验证码查询
+    request:
+      method: GET
+      url: /accounts/captcha/search
+      params:
+        phoneNumber: $phone_number
+    validate:
+      - eq: [ "status_code", 200 ]
+      - contains: [ "text", "captcha" ]
+
+  - name: 校验短信验证码
+    setup_hooks:
+      - "${captcha($request,$url,$phone_number)}"
+    request:
+      method: POST
+      url: /accounts/captcha/check
+      json:
+        acwTc: null
+        captchaType: $captchaType
+        sendType: $sendType
+        phoneNumber: $phone_number
+    validate:
+      - eq: [ "status_code", $status_code ]
+      - contains: [ "text", $msg ]
+
+
+

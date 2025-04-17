@@ -1,0 +1,33 @@
+config:
+  name: "/accounts/batch B端:批量注册用户"
+  base_url: ${ENV(BASE_URL)}
+  parameters:
+    name-code-status_code-msg:
+      - [ "批量注册用户-传不存在的pid",1,403,"不合法的pid" ]
+      - [ "批量注册用户-pid传空",2,400,"size must be between 1 and 10" ]
+      - [ "批量注册用户-prefix传空",3,400,"a-zA-Z" ]
+      - [ "批量注册用户-prefix不符合规则",4,400,"a-zA-Z" ]
+      - [ "批量注册用户-手机号已经注册",5,403,"PhoneHasBeenRegisterException" ]
+      - [ "批量注册用户-fullname不符合规则",6,400,"s?[a-zA-Z" ]
+      - [ "批量注册用户-手机号传空",7,400,"d{7,20" ]
+      - [ "批量注册用户-手机号格式错误",8,400,"d{7,20" ]
+      - [ "批量注册用户-密码传空",9,400,"size must be between 6 and 20" ]
+      - [ "批量注册用户-密码小于6位",10,400,"size must be between 6 and 20" ]
+      - [ "批量注册用户-密码大于20位",11,400,"size must be between 6 and 20" ]
+      - [ "批量注册用户-正常注册一个用户",12,200,"username" ]
+      - [ "批量注册用户-正常注册多个用户",13,200,"username" ]
+
+
+
+
+teststeps:
+  - name: $name
+    setup_hooks:
+      - "${account_batch($request,$code)}"
+    request:
+      method: POST
+      url: /accounts/batch
+    validate:
+      - eq: [ "status_code", $status_code ]
+      - contains: [ "text", $msg ]
+

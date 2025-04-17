@@ -1,0 +1,28 @@
+config:
+  name: "/accounts/list/search 搜索用户信息"
+  base_url: ${ENV(BASE_URL)}
+  variables:
+    url: ${ENV(BASE_URL)}
+  parameters:
+    name-status_code-msg-type:
+      - [ "搜索用户信息-搜索已经注册的用户ID ",200,"id",1]
+      - [ "搜索用户信息-搜索不存在的用户ID ",200,"items",2]
+      - [ "搜索用户信息-搜索fullname ",200,"fullname",3]
+      - [ "搜索用户信息-搜索一个已经注册的手机号 ",200,"phone_number",4]
+      - [ "搜索用户信息-搜索没有注册的手机号 ",200,"total",5]
+      - [ "搜索用户信息-通过昵称搜索用户 ",200,"nickname",6]
+      - [ "搜索用户信息-使用单个字段查询用户 ",200,"id",7]
+
+
+
+teststeps:
+  - name: $name
+    setup_hooks:
+      - "${accounts_list_search($request,$type)}"
+    request:
+      method: POST
+      url: /accounts/list/search
+    validate:
+      - eq: [ "status_code", $status_code ]
+      - contains: [ "text", $msg]
+

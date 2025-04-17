@@ -1,0 +1,21 @@
+config:
+  name: "/accounts/usernames/check 批量检测用户名是否存在"
+  base_url: ${ENV(BASE_URL)}
+  parameters:
+    name-username-status_code-msg:
+      - [ "批量检测用户名是否存在-传一个已经存在的用户名", ["qinwang1997"], 200, "true" ]
+      - [ "批量检测用户名是否存在-传一个不存在的用户名", ["qwang19397"], 200, "false" ]
+      - [ "批量检测用户名是否存在-传多个用户名", ["qinwang1997","qinwang123"], 200, "true" ]
+      - [ "批量检测用户名是否存在-传非正确格式的用户名", ["秦旺"], 200, "false" ]
+
+teststeps:
+  - name: $name
+    request:
+      method: POST
+      url: /accounts/usernames/check
+      json:
+        usernames: $username
+    validate:
+      - eq: [ "status_code", $status_code ]
+      - contains: [ "text", $msg ]
+

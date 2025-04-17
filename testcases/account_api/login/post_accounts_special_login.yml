@@ -1,0 +1,28 @@
+config:
+  name: "/tiger/v3/app/accounts/login 用户名密码登录-特殊登录场景"
+  base_url: ${ENV(ACCOUNT_API_URL)}
+  parameters:
+    name-Origin-Client-Version-status_code-msg:
+      - [ "登录-来源网址在禁用名单内","https://creation.codemao.cn","","",403,"域名已被禁止访问此接口" ]
+      - [ "登录-来源网址不在禁用名单内","https://api.codemao.cn","","",200,"token" ]
+      - [ "登录-传Client-Id","","web","",200,"token" ]
+      - [ "登录-传Auth-Version","","","1.0.0",200,"refresh" ]
+
+
+teststeps:
+  - name: $name
+    request:
+      method: POST
+      url: /tiger/v3/web/accounts/login
+      headers:
+        Origin: $Origin
+        Client-Id: $Client
+        Auth-Version: $Version
+      json:
+        identity: 14266669999
+        password: 123456
+        pid: account
+    validate:
+      - eq: [ "status_code", $status_code ]
+      - contains: [ "text", $msg ]
+

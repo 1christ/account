@@ -1,0 +1,21 @@
+config:
+  name: "/accounts/oauth/{unionId} 通过unionid获取用户信息"
+  base_url: ${ENV(BASE_URL)}
+  variables:
+    url: ${ENV(BASE_URL)}
+    u_id: ${accounts_oauth_unionId($url)}
+  parameters:
+    name-unionid-status_code-msg:
+      - [ "通过unionid获取用户信息 - 通过unionid查询",$u_id,200,"unionid"]
+      - [ "通过unionid获取用户信息 - unionid未注册查询","dsadsaassa",204,""]
+
+
+teststeps:
+  - name: $name
+    request:
+      method: GET
+      url: /accounts/oauth/$unionid
+    validate:
+      - eq: [ "status_code", $status_code ]
+      - contains: [ "text", $msg]
+

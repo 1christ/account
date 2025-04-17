@@ -1,0 +1,25 @@
+config:
+    name: "/accounts 更新用户信息"
+    base_url: ${ENV(BASE_URL)}
+    variables:
+        user_id: ${ENV(PUT_USER_ID)}
+        url: ${ENV(BASE_URL)}
+    parameters:
+        num-name-fields-status_code-value: ${put_accounts()}
+
+teststeps:
+-
+    name: $name
+    request:
+        method: PUT
+        url: /accounts/$user_id
+    setup_hooks:
+        - "${update_accounts_put($request,$fields)}"
+    teardown_hooks:
+        - "${time_sleep()}"
+    validate:
+        - eq: ["status_code", $status_code]
+        - eq: ["${select_mysql_date($num,$user_id)}", $value]
+
+
+

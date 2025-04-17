@@ -1,0 +1,104 @@
+config:
+  name: "/accounts/batch B端:批量注册用户"
+  base_url: ${ENV(BASE_URL)}
+  variables:
+    url: ${ENV(BASE_URL)}
+    phone_number: ${black_list($url,1)}
+    username: ${black_list($url,2)}
+    email: ${black_list($url,3)}
+  parameters:
+    name-identity:
+      - [ "黑名单流程-手机号黑名单",$phone_number]
+      - [ "黑名单流程-用户名黑名单",$username]
+      - [ "黑名单流程-邮箱黑名单",$email]
+
+
+teststeps:
+  - name: $name
+    request:
+      method: POST
+      url: /accounts/black-list
+      json:
+        identity: $identity
+        operatorId: 1
+        pid: account
+    validate:
+      - eq: [ "status_code", 200 ]
+
+  - name:  检查账号标识是否在黑名单
+    request:
+        method: GET
+        url: /accounts/black-list/check
+        params:
+            identity: $identity
+    validate:
+        - eq: ["status_code", 200]
+        - contains: [ "text", "true" ]
+
+  - name:  查询所有的黑名单用户
+    request:
+        method: GET
+        url: /accounts/black-list/list
+    validate:
+        - eq: ["status_code", 200]
+        - contains: [ "text", $identity ]
+
+  - name:   将账号标识从黑名单移除
+    request:
+        method: DELETE
+        url: /accounts/black-list
+        params:
+            identity: $identity
+    validate:
+        - eq: ["status_code", 200]
+
+  - name: 检查账号标识是否在黑名单中删除
+    request:
+      method: GET
+      url: /accounts/black-list/check
+      params:
+        identity: $identity
+    validate:
+      - eq: [ "status_code", 200 ]
+      - contains: [ "text", "false" ]
+
+  - name: 操作用户黑名单  加入黑名单
+    request:
+      method: POST
+      url: /accounts/black-list/operate?identity=$identity&pid=account&operatorId=1
+    validate:
+      - eq: [ "status_code", 200 ]
+      - contains: [ "text", "true" ]
+
+
+  - name: 检查账号标识是否在黑名单
+    request:
+      method: GET
+      url: /accounts/black-list/check
+      params:
+        identity: $identity
+    validate:
+      - eq: [ "status_code", 200 ]
+      - contains: [ "text", "true" ]
+
+  - name: 操作用户黑名单  删除黑名单
+    request:
+      method: POST
+      url: /accounts/black-list/operate?identity=$identity&pid=account&operatorId=1
+    validate:
+      - eq: [ "status_code", 200 ]
+      - contains: [ "text", "true" ]
+
+
+  - name: 检查账号标识是否在黑名单中删除
+    request:
+      method: GET
+      url: /accounts/black-list/check
+      params:
+        identity: $identity
+    validate:
+      - eq: [ "status_code", 200 ]
+      - contains: [ "text", "false" ]
+
+
+

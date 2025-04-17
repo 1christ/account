@@ -1,0 +1,25 @@
+config:
+  name: "/tiger/v3/app/accounts/phone/login/post-process 通过手机号短信登入【后置校验验证码版本】"
+  base_url: ${ENV(ACCOUNT_API_URL)}
+  variables:
+    base_url: ${ENV(ACCOUNT_API_URL)}
+  parameters:
+    name-code-status_code-msg:
+      - [ "手机验证码登录-输入错误的验证码登录",1,403,"校验验证码失败" ]
+      - [ "手机验证码登录-输入正确的验证码登录",2,200,"token" ]
+      - [ "手机验证码登录-输入已经过期的验证码登录",3,403,"校验验证码失败" ]
+      - [ "手机验证码登录-验证码传空登录",4,400,"输入格式错误" ]
+      - [ "手机验证码登录-不发送验证码登录",5,403,"校验验证码失败" ]
+      - [ "手机验证码登录-手机号未注册",6,403,"手机号未注册" ]
+
+teststeps:
+  - name: $name
+    setup_hooks:
+      - "${accounts_phone_login_post_process($request,$code,$base_url)}"
+    request:
+      method: POST
+      url: /tiger/v3/app/accounts/phone/login/post-process
+    validate:
+      - eq: [ "status_code", $status_code ]
+      - contains: [ "text", $msg ]
+

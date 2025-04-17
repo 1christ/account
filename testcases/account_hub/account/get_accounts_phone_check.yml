@@ -1,0 +1,22 @@
+config:
+    name: "/accounts/phone/check 检查手机号在编程猫平台账号的注册情况"
+    base_url: ${ENV(BASE_URL)}
+    parameters:
+        name-phone_number-msg:
+            - ["使用一个不符合规则的手机号查询","120245c","false"]
+            - ["使用一个已注册的手机号查询","13037375544","true"]
+            - ["使用一个未注册的手机号查询","142033849564","false"]
+
+teststeps:
+-
+    name: $name
+    request:
+        method: GET
+        url: /accounts/phone/check
+        params:
+            phone_number: $phone_number
+    validate:
+        - eq: ["status_code", 200]
+        - contains: [ "text", $msg]
+
+

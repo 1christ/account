@@ -1,0 +1,29 @@
+config:
+  name: "/tiger/user_token/expires getUserTokenExpires"
+  base_url: ${ENV(ACCOUNT_API_URL)}
+
+teststeps:
+  - name: 登录
+    request:
+      method: POST
+      url: /tiger/v3/web/accounts/login
+      json:
+        identity: 14266669999
+        password: 123456
+        pid: account
+    validate:
+      - eq: [ "status_code", 200 ]
+      - contains: [ "text", "token" ]
+    extract:
+      token: body.auth.token
+
+  - name:  getUserTokenExpires
+    request:
+      method: GET
+      url: /tiger/user_token/expires
+      headers:
+        Authorization: $token
+    validate:
+      - eq: [ "status_code", 200 ]
+      - contains: [ "text", "expired_at" ]
+

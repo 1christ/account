@@ -1,0 +1,28 @@
+config:
+  name: "/accounts 登录校验"
+  base_url: ${ENV(BASE_URL)}
+  variables:
+    url: ${ENV(BASE_URL)}
+  parameters:
+    name-code-status_code-msg:
+      - [ "登录校验-输入正确手机号密码",1,200,"id" ]
+      - [ "登录校验-输入正确邮箱密码",2,200,"id" ]
+      - [ "登录校验-输入正确用户名密码",3,200,"id" ]
+      - [ "登录校验-用户不存在",4,422,"用户不存在" ]
+      - [ "登录校验-密码错误",5,422,"密码错误" ]
+      - [ "登录校验-identity传空",6,400,"size must be between 1 and 50" ]
+      - [ "登录校验-password传空",7,400,"size must be between 1 and 2147483647" ]
+
+
+
+teststeps:
+  - name: $name
+    setup_hooks:
+      - "${account_auth_check($request,$code,$url)}"
+    request:
+      method: POST
+      url: /accounts/auth
+    validate:
+      - eq: [ "status_code", $status_code ]
+      - contains: [ "text", $msg ]
+

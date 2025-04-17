@@ -1,0 +1,24 @@
+config:
+  name: "/accounts/oauth/wechat/info批量获取用户微信信息"
+  base_url: ${ENV(BASE_URL)}
+  variables:
+    url: ${ENV(BASE_URL)}
+    u_id: ${ENV(ENV_USER_ID)}
+  parameters:
+    name-user_id-status_code-msg:
+      - [ "批量获取用户微信信息 - 查询单个用户的微信信息",[10000],200,"unionid"]
+      - [ "批量获取用户微信信息 - 查询多个用户的微信信息",[10000,$u_id],200,"unionid"]
+      - [ "批量获取用户微信信息 - 查询没有绑定微信用户的微信信息",[1000],200,""]
+
+
+teststeps:
+  - name: $name
+    request:
+      method: POST
+      url: /accounts/oauth/wechat/info
+      json:
+        user_ids: $user_id
+    validate:
+      - eq: [ "status_code", $status_code ]
+      - contains: [ "text", $msg]
+

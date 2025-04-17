@@ -1,0 +1,20 @@
+config:
+    name: "/accounts/business 批量用户id搜索用户拓展信息"
+    base_url: ${ENV(BASE_URL)}
+    parameters:
+        name-url_data-foo1:
+            - ["查询一个用户ID","user_ids=10000","age_section_id"]
+            - ["查询多个用户ID","user_ids=10000&user_ids=10001","doing"]
+            - ["查询一个不存在的用户ID","user_ids=100",""]
+            - ["带fields参数查询","user_ids=10000&fields=id&fields=age_section_id&fields=mlz_name&fields=gold","mlz_name"]
+
+teststeps:
+-
+    name: $name
+    request:
+        method: GET
+        url: /accounts/business?$url_data
+    validate:
+        - eq: ["status_code", 200]
+        - contains: [ "text", $foo1]
+

@@ -1,0 +1,26 @@
+config:
+    name: "/accounts/{id}获取用户信息"
+    base_url: ${ENV(BASE_URL)}
+    parameters:
+        name-user_id-fields-status_code-type:
+            - ["查询存在的用户ID",10000,"",200,1]
+            - ["查询一个不存在的用户ID",100,"",204,3]
+            - ["查询一个错误的用户ID","abc","",404,3]
+            - ["带fields参数查询",10000,"id,username,email,phone_number",200,2]
+
+teststeps:
+-
+    name: $name
+    variables:
+        foo1: ${return_random_string($type)} # 随即返回一个字段，然后进行断言，看返回体中是否存在字段
+        foo2: ${return_random_string($type)}
+    request:
+        method: GET
+        url: /accounts/$user_id
+        params:
+            fields: $fields
+    validate:
+        - eq: ["status_code", $status_code]
+        - contains: [ "text", $foo1]
+        - contains: [ "text", $foo2]
+

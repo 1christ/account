@@ -1,0 +1,64 @@
+config:
+  name: "地址相关"
+  base_url: ${ENV(BASE_URL)}
+  parameters:
+    name-default:
+      - [ "地址库 - 添加普通地址","false"]
+      - [ "地址库 - 添加默认地址","true"]
+
+teststeps:
+  - name: 添加收货地址
+    request:
+      method: POST
+      url: /accounts/delivery-information
+      json:
+        cityId: 202
+        consignee: 1
+        countryId: 156
+        defaultAddress: $default
+        detail: "第一次添加收货地址"
+        districtId: 1859
+        phoneNumber: "18585855555"
+        provinceId : 19
+        userId: 10000
+    validate:
+      - eq: [ "status_code", 200 ]
+      - contains: [ "text", "" ]
+
+  - name: 获取所有收货地址
+    request:
+      method: GET
+      url: /accounts/delivery-information?userId=10000
+    validate:
+      - eq: [ "status_code", 200 ]
+      - contains: [ "text", "第一次添加收货地址" ]
+    extract:
+      id: body[0].id
+
+  - name: 编辑收货地址
+    request:
+      method: PATCH
+      url: /accounts/delivery-information
+      json:
+        cityId: 202
+        consignee: 1
+        countryId: 156
+        defaultAddress: $default
+        detail: "第二次编辑收货地址"
+        districtId: 1859
+        phoneNumber: "18585855555"
+        provinceId: 19
+        userId: 10000
+        deliveryId: $id
+    validate:
+      - eq: [ "status_code", 200 ]
+
+  - name: 删除收货地址
+    request:
+      method: DELETE
+      url: /accounts/delivery-information
+      json:
+        userId: 10000
+        deliveryId: $id
+    validate:
+      - eq: [ "status_code", 200 ]

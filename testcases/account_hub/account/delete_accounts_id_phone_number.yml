@@ -1,0 +1,24 @@
+config:
+    name: "/accounts/{id}/phone_number解绑手机"
+    base_url: ${ENV(BASE_URL)}
+    variables:
+        url: ${ENV(BASE_URL)}
+    parameters:
+        name-type-status_code-msg:
+            - ["正常解绑手机号",1,204,""]
+            - ["解绑手机号-用户未设置用户名",2,403,"ShouldSetUsernameException"]
+            - ["解绑手机号-用户设置了用户名，没有设置密码",3,403,"ShouldSetPasswordException"]
+            - ["解绑手机号-用户设置了邮箱，没有设置密码",4,403,"ShouldSetPasswordException"]
+
+teststeps:
+-
+    name: $name
+    variables:
+        user_id: ${delete_phone($type,$url)}
+    request:
+        method: DELETE
+        url: /accounts/$user_id/phone_number
+    validate:
+        - eq: ["status_code", $status_code]
+        - contains: [ "text", $msg]
+

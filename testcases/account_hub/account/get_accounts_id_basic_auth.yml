@@ -1,0 +1,20 @@
+config:
+    name: "/accounts/{id}/basic_auth 获取主账号信息"
+    base_url: ${ENV(BASE_URL)}
+    parameters:
+        name-user_id-status_code-type:
+            - ["查询存在的用户ID",10000,200,1]
+            - ["查询一个不存在的用户ID",100,422,2]
+
+teststeps:
+-
+    name: $name
+    variables:
+        foo1: ${return_random_string_3($type)} # 随即返回一个字段，然后进行断言，看返回体中是否存在字段
+    request:
+        method: GET
+        url: /accounts/$user_id/basic_auth
+    validate:
+        - eq: ["status_code", $status_code]
+        - contains: [ "text", $foo1]
+

@@ -1,0 +1,25 @@
+config:
+    name: "/phones/single/id 通过用户ID获取手机号"
+    base_url: ${ENV(BASE_URL)}
+    variables:
+        url: ${ENV(BASE_URL)}
+    parameters:
+        name-type-value:
+            - ["查询一个不存在的用户ID",1,""]
+            - ["查询一个没有绑定手机号的用户ID",2,""]
+            - ["查询一个绑定了手机号的用户ID",3,"hashedPhoneNumber"]
+
+
+teststeps:
+-
+    name: $name
+    setup_hooks:
+        - "${phone_single_id($request,$url,$type)}"
+    request:
+        method: GET
+        url: /phones/single/
+    validate:
+        - eq: ["status_code", 200]
+        - contains: [ "text", $value]
+
+

@@ -1,0 +1,27 @@
+config:
+    name: "/accounts/{id}/oauth通过用户id获取第三方授权信息"
+    base_url: ${ENV(BASE_URL)}
+    variables:
+        foo1: ${ENV(ENV_USER_ID)}
+        foo2: ${ENV(NO_OAUTH_USER_ID)}
+    parameters:
+        name-user_id-status_code-oauth_type:
+            - ["查询用户的微信授权信息",$foo1,200,"WECHAT"]
+            - ["查询用户的QQ授权信息",$foo1,200,"QQ"]
+            - ["查询没有绑定微信的用户的微信授权信息",$foo2,200,"WECHAT"]
+
+
+teststeps:
+-
+    name: $name
+    request:
+        method: GET
+        url: /accounts/$user_id/oauth
+        params:
+            oauth_type: $oauth_type
+    validate:
+        - eq: ["status_code", $status_code]
+        - contains: [ "text", "id"]
+        - contains: [ "text", "unionid"]
+
+

@@ -1,0 +1,25 @@
+config:
+    name: "检查主账号注册情况(手机号、用户名、邮箱)"
+    base_url: ${ENV(BASE_URL)}
+    parameters:
+        name-identity-status_code-msg:
+            - ["使用一个已经注册的手机号查询",13037375544,200,"phone_number"]
+            - ["使用一个未注册的手机号查询","144091723854",204,""]
+            - ["使用一个已经注册的用户名查询","qinwang1997",200,"username"]
+            - ["使用一个未注册的用户名查询","nysp1542",204,""]
+            - ["使用一个已经注册的邮箱查询","1583492267@qq.com",200,"email"]
+            - ["使用一个未注册的用户名查询","kjdsdsds@okju.com",204,""]
+
+teststeps:
+-
+    name: $name
+    request:
+        method: GET
+        url: /accounts/identity/check
+        params:
+            identity: $identity
+    validate:
+        - eq: ["status_code", $status_code]
+        - contains: [ "text", $msg]
+
+

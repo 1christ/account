@@ -1,0 +1,49 @@
+config:
+  name: "/tiger/v3/app/accounts/logout 退出登录"
+  base_url: ${ENV(ACCOUNT_API_URL)}
+
+teststeps:
+  - name: 登录
+    request:
+      method: POST
+      url: /tiger/v3/web/accounts/login
+      json:
+        identity: 14266669999
+        password: 123456
+        pid: account
+    validate:
+      - eq: [ "status_code", 200 ]
+      - contains: [ "text", "token" ]
+    extract:
+      token: body.auth.token
+
+  - name: 获取用户信息
+    request:
+      method: GET
+      url: /tiger/v3/app/accounts/profile
+      headers:
+        Authorization: $token
+    validate:
+      - eq: [ "status_code", 200 ]
+      - contains: [ "text", "id"]
+
+  - name: 退出登录
+    request:
+      method: POST
+      url: /tiger/v3/web/accounts/logout
+      headers:
+        Authorization: $token
+    validate:
+      - eq: [ "status_code", 204 ]
+
+
+  - name: 获取用户信息
+    request:
+      method: GET
+      url: /tiger/v3/app/accounts/profile
+      headers:
+        Authorization: $token
+    validate:
+      - eq: [ "status_code", 403 ]
+      - contains: [ "text", "Full authentication is required to access this resource" ]
+

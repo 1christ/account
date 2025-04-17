@@ -1,0 +1,27 @@
+config:
+  name: "/tiger/v3/app/accounts/captcha/login/silence发送登入验证码-静默登录"
+  base_url: ${ENV(ACCOUNT_API_URL)}
+  variables:
+    base_url: ${ENV(ACCOUNT_API_URL)}
+    ticket: ${accounts_api_ticket($base_url)}
+  parameters:
+    name-phone_number-pid-status_code-msg:
+      - [ "发送登入验证码-静默登录-输入已经注册的手机号发送验证码","14266669997","account",204,"" ]
+      - [ "发送登入验证码-静默登录-输入未注册的手机号发送验证码","14266662355","account",204,"" ]
+      - [ "发送登入验证码-静默登录-手机验证码发送频繁","14266662355","account",403,"发送验证码过于频繁" ]
+
+
+teststeps:
+  - name: $name
+    request:
+      method: POST
+      headers:
+        X-Captcha-Ticket: $ticket
+      url: /tiger/v3/app/accounts/captcha/login/silence
+      json:
+        phone_number: $phone_number
+        pid: $pid
+    validate:
+      - eq: [ "status_code", $status_code ]
+      - contains: [ "text", $msg ]
+

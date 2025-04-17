@@ -1,0 +1,29 @@
+config:
+  name: "/accounts/{id}/username设置用户名"
+  base_url: ${ENV(BASE_URL)}
+  variables:
+    user_id: ${ENV(PUT_USER_ID)}
+    url: ${ENV(BASE_URL)}
+  parameters:
+    name-user_ids-username-status_code-msg-code:
+      - [ "用户已经设置了用户名",$user_id,"qinwan1g2",403,"UserCanNotRepeatSettingUsernameException",1 ]
+      - [ "用户设置username",1,"",204,"",2 ]
+      - [ "设置的用户名已存在",$user_id,"qinwang123",403,"ExistSameUsernameException",1 ]
+      - [ "设置的用户名不符合规则",$user_id,"2qinwang",400,"MethodArgumentNotValidException",1 ]
+
+
+
+teststeps:
+  - name: $name
+    request:
+      method: PATCH
+      url: /accounts/$user_id/username
+      json:
+        username: $username
+    setup_hooks:
+      - "${update_patch_accounts_username($request,$code,$url)}"
+    validate:
+      - eq: [ "status_code", $status_code ]
+      - contains: [ "text", $msg ]
+
+

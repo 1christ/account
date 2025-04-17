@@ -1,0 +1,27 @@
+config:
+  name: "/accounts/batch/register/phone 通用批量手机注册"
+  base_url: ${ENV(BASE_URL)}
+  variables:
+    url: ${ENV(BASE_URL)}
+  parameters:
+    name-code-status_code-msg:
+      - [ "通用批量手机注册-传不存在的pid",1,403,"不合法的pid" ]
+      - [ "通用批量手机注册-pid传空",2,400,"size must be between 1 and 10" ]
+      - [ "通用批量手机注册-phone_number 传空",3,400,"d{7,20" ]
+      - [ "通用批量手机注册-传不符合格式的 phone_number",4,400,"d{7,20" ]
+      - [ "通用批量手机注册-通过phone_number创建一个账号",5,200,"true" ]
+      - [ "通用批量手机注册-通过phone_number创建多个账号",6,200,"true" ]
+      - [ "通用批量手机注册-通过phone_number 手机号已经注册",7,200,"false" ]
+
+
+teststeps:
+  - name: $name
+    setup_hooks:
+      - "${account_batch_register_phone($request,$code)}"
+    request:
+      method: POST
+      url: /accounts/batch/register/phone
+    validate:
+      - eq: [ "status_code", $status_code ]
+      - contains: [ "text", $msg ]
+

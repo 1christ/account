@@ -1,0 +1,28 @@
+config:
+    name: "/accounts 批量用户id搜索用户信息"
+    base_url: ${ENV(BASE_URL)}
+    parameters:
+        name-user_ids-fields-status_code-type:
+            - ["查询单个用户ID",10000,"",200,1]
+            - ["查询多个用户ID","10000,10001","",200,1]
+            - ["带fields查询用户","10000,10001","id,username,email,phone_number",200,2]
+            - ["查询一个不存在的用户ID","1000","",200,3]
+            - ["用户ID为空进行查询","","",400,4]
+
+teststeps:
+-
+    name: $name
+    variables:
+        foo1: ${return_random_string($type)} # 随即返回一个字段，然后进行断言，看返回体中是否存在字段
+        foo2: ${return_random_string($type)}
+    request:
+        method: GET
+        url: /accounts
+        params:
+            user_ids : $user_ids
+            fields: $fields
+    validate:
+        - eq: ["status_code", $status_code]
+        - contains: [ "text", $foo1]
+        - contains: [ "text", $foo2]
+

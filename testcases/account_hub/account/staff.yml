@@ -1,0 +1,55 @@
+config:
+  name: "外部用户跟内部账号绑定 - 通过用户id获取用户内部职工资料- 批量获取用户内部职工资料-移除用户-内部账号关系 "
+  base_url: ${ENV(BASE_URL)}
+  variables:
+    url: ${ENV(BASE_URL)}
+
+teststeps:
+  - name: 添加用户-内部账号关系
+    request:
+      method: POST
+      url: /accounts/staff
+      json:
+        - employeeState: 1
+          internalId: 2
+          userId: 10000
+    validate:
+      - eq: [ "status_code", 200 ]
+
+  - name: 用户-内部账号关系单个 查询
+    request:
+      method: GET
+      url: /accounts/staff/10000
+    validate:
+      - eq: [ "status_code", 200 ]
+      - contains: [ "text", "employeeState" ]
+
+  - name: 用户-内部账号关系批量 查询
+    request:
+      method: GET
+      url: /accounts/staff?userIds=10000
+    validate:
+      - eq: [ "status_code", 200 ]
+      - contains: [ "text", internalId ]
+
+  - name: 移除用户-内部账号关系
+    request:
+      method: POST
+      url: /accounts/staff/remove
+      json:
+        ids: [10000]
+    validate:
+      - eq: [ "status_code", 200 ]
+
+  - name: 用户-内部账号关系单个 查询
+    request:
+      method: GET
+      url: /accounts/staff/10000
+    validate:
+      - eq: [ "status_code", 200 ]
+      - contains: [ "text", "" ]
+
+
+
+
+
